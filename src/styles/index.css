@@ -10,3 +10,8 @@
     import 'relative/path/to/stylesheet.scss';
 
 */
+
+body{
+    font-family: 'Playfair Display', serif;
+    font-size: 18px; 
+}
