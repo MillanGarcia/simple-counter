@@ -6,59 +6,74 @@ import Reloj from "../../img/stopwatch-solid.svg"
 
 //create your first component
 const Home = () => {
-	const[play,setPlay]=useState(false);
-	const[typetime,setTypetime]=useState("secs");
-	const[countdown,setCountdown]=useState(false);
-	const[cuenta,setCuenta]=useState(0);
-	const[cdnum,setCdnum]=useState(0);
-	const[precdnum,setPrecdnum]=useState();
-	const[cuenta1,setCuenta1]=useState("");
-	const[cuenta2,setCuenta2]=useState("");
-	const[cuenta3,setCuenta3]=useState("");
-	const[cuenta4,setCuenta4]=useState("");
-	const[cuenta5,setCuenta5]=useState("");
-	const[cuenta6,setCuenta6]=useState("");
+	const[prealerta,setPrealerta]=useState();//almacena el tiempo necesario para la alerta
+	const[alerta,setAlerta]=useState(0);
+	const[play,setPlay]=useState(false);////activa el contador hacia delante
+	const[typetime,setTypetime]=useState("secs");//indica el tipo de tiempo usado al escribir en la cuenta atrás necesaria
+	const[countdown,setCountdown]=useState(false);//activa el contador hacia atras
+	const[cuenta,setCuenta]=useState(0);//Almacena la cuenta normal 
+	const[cdnum,setCdnum]=useState(0);//Almacena la cuenta atras
+	const[precdnum,setPrecdnum]=useState();//Almacena el numero que indica el usuario para la cuenta atrás
+	const[cuenta1,setCuenta1]=useState(null);
+	const[cuenta2,setCuenta2]=useState(null);
+	const[cuenta3,setCuenta3]=useState(null);
+	const[cuenta4,setCuenta4]=useState(null);
+	const[cuenta5,setCuenta5]=useState(null);
+	const[cuenta6,setCuenta6]=useState(null);
 	
-
-	const escritura=(e)=>{
-		var nuevonumero= parseInt(e);
+	const writeCdnum=(e)=>{
+		let nuevonumero= parseInt(e);
 		setPrecdnum(nuevonumero);
 	}
 
+	const writealarm=(e)=>{
+		let nuevaalarma= parseInt(e);
+		setPrealerta(nuevaalarma);
+	}
+	
 	const reCuentaAtras=(typetime)=>{
 		console.log(typetime)
 		switch (typetime) {
 			case "secs":
 				setCdnum(precdnum);
+				setAlerta(prealerta);
 				break;
 			case "mins":
 				setCdnum(precdnum*60);
+				setAlerta(prealerta*60);
 				break;
 			case "hours":
 				setCdnum(precdnum*3600);
+				setAlerta(prealerta*3600);
 				break;
 			default:
 				break;
 		}
 		setCountdown(true);
 	}
-
+	const funciondoble=()=>{
+		setPlay(!play)
+		
+		reCuentaAtras(typetime)
+		setCountdown(false);
+	}
 	const restart=()=>{
 		setCuenta(0)
 		setPlay(false)
-		setCuenta1(0)
-		setCuenta2(0)
-		setCuenta3(0)
-		setCuenta4(0)
-		setCuenta5(0)
-		setCuenta6(0)
+		setCuenta1(null)
+		setCuenta2(null)
+		setCuenta3(null)
+		setCuenta4(null)
+		setCuenta5(null)
+		setCuenta6(null)
 		console.log("reiniciado")
 	}
 
 	const regresiva=()=>{
+		console.log("esto es la regresiva"+countdown)
 		setCdnum(cdnum-1);
 		let numstr=`${cdnum}`;
-
+		//setPrealerta(prealerta-1)
 		setCuenta1(numstr[numstr.length-1])
 		setCuenta2(numstr[numstr.length-2])
 		setCuenta3(numstr[numstr.length-3])
@@ -67,12 +82,11 @@ const Home = () => {
 		setCuenta6(numstr[numstr.length-6])
 		setPlay(false);
 	}
-
+	
 	const suma=()=>{
-		
 		setCuenta(cuenta+1);
 		let numstr=`${cuenta}`;
-		
+		//setPrealerta(prealerta-1)
 		setCuenta1(numstr[numstr.length-1])
 		setCuenta2(numstr[numstr.length-2])
 		setCuenta3(numstr[numstr.length-3])
@@ -84,20 +98,38 @@ const Home = () => {
 	
 	useEffect(()=>{
 		
-		if(play){
-			console.log("playing>>"+cuenta)
-			const t=setInterval(() => {
-			suma(); 
-			return clearInterval(t)
-		}, 1000);}
-		if(countdown && cdnum>=0){
-			console.log("cuenta atras"+cdnum)
-			const y=setInterval(() => {
-				regresiva(); 
-				return clearInterval(y)
-			}, 1000);
-
-		}
+		setAlerta(alerta-1)
+		console.log("playing alerta "+alerta)
+		alerta===-1?alert("Se terminó tu tiempo!" ):"";//porque se usa el -2? porque se hace un primer renderizado que resta uno a la cuenta atrás de la alarma
+		//si escribo este codigo, despues del if(lineas 103-118) en vez de antes, se suman dos enteros extra al valor de la cuenta, porque?
+			if(play){
+				console.log("playing>> "+cuenta)
+				//console.log("prealerta"+prealerta)
+				setCountdown(false);
+				const t=setInterval(() => {
+					suma();
+					
+					return clearInterval(t)
+				}, 1000);
+			}
+		
+			if(countdown && cdnum>=0){
+				console.log("cuenta atras>> "+cdnum)
+				const y=setInterval(() => {
+					regresiva();
+					
+					return clearInterval(y)
+				}, 1000);
+			}
+			if(cuenta1===null && play===false && countdown===false){//este condicional if, sirve para pasar de nuevo la funcion restart, y no se quede el numero que aparece en imagen como el ultimo que conto, es necesario pasarla dos veces
+				restart();
+				
+				cuenta1===null ?console.log("CUENTA NULL"):"";
+				console.log("pepito")
+			}
+		//setPrealerta(prealerta-1)
+		//console.log("playing alerta "+prealerta)
+		//prealerta===-2?alert("Hello! I am an alert boxer!"):"";
 	},[cuenta,play,countdown,cdnum])
 
 	return (
@@ -111,38 +143,42 @@ const Home = () => {
 						</svg>
 					</div>
 					<div className="col-8 row p-2 me-3">
-						<div className="col-2 p-3 bg-dark bg-opacity-50 border-5 border-top-0 border-bottom-0 border border-dark  rounded">{cuenta6?cuenta6:0}</div>
-						<div className="col-2 p-3 bg-dark bg-opacity-50 border-5 border-top-0 border-bottom-0 border border-dark  rounded">{cuenta5?cuenta5:0}</div>
-						<div className="col-2 p-3 bg-dark bg-opacity-50 border-5 border-top-0 border-bottom-0 border border-dark  rounded">{cuenta4?cuenta4:0}</div>
-						<div className="col-2 p-3 bg-dark bg-opacity-50 border-5 border-top-0 border-bottom-0 border border-dark  rounded">{cuenta3?cuenta3:0}</div>
-						<div className="col-2 p-3 bg-dark bg-opacity-50 border-5 border-top-0 border-bottom-0 border border-dark  rounded">{cuenta2?cuenta2:0}</div>
-						<div className="col-2 p-3 bg-dark bg-opacity-50 border-5 border-top-0 border-bottom-0 border border-dark  rounded" >{cuenta1?cuenta1:0}</div>
+						<div className="col-2 p-3 bg-dark bg-opacity-50 border-5 border-top-0 border-bottom-0 border border-dark  rounded">{cuenta6?cuenta6:"0"}</div>
+						<div className="col-2 p-3 bg-dark bg-opacity-50 border-5 border-top-0 border-bottom-0 border border-dark  rounded">{cuenta5?cuenta5:"0"}</div>
+						<div className="col-2 p-3 bg-dark bg-opacity-50 border-5 border-top-0 border-bottom-0 border border-dark  rounded">{cuenta4?cuenta4:"0"}</div>
+						<div className="col-2 p-3 bg-dark bg-opacity-50 border-5 border-top-0 border-bottom-0 border border-dark  rounded">{cuenta3?cuenta3:"0"}</div>
+						<div className="col-2 p-3 bg-dark bg-opacity-50 border-5 border-top-0 border-bottom-0 border border-dark  rounded">{cuenta2?cuenta2:"0"}</div>
+						<div className="col-2 p-3 bg-dark bg-opacity-50 border-5 border-top-0 border-bottom-0 border border-dark  rounded" >{cuenta1?cuenta1:"Start?"}</div>
 					</div>
 				</h1>
 				<div className="row justify-content-end p-1 fw-semibold mx-5">
-					<button className="col-2 p-1 rounded fw-bold " onClick={()=>setPlay(!play)}>{play?"Pause":"Play"}</button>
+					<button className="col-2 p-1 rounded fw-bold " onClick={()=>funciondoble()} >{play?"Pause":cuenta===0?"Play":`Play: ${cuenta-1}`}</button>
 					<button className="col-2 p-1 rounded fw-bold" onClick={()=>restart()}>Restart</button>
 				</div>
 				<div className="row justify-content-end p-1  mx-5">	
-					<button className="col-2 p-1 rounded fw-bold" onClick={()=>setCountdown(!countdown)}>{countdown?"Stop countdown":"Resume countdown"}</button>
+					<button className="col-2 p-1 rounded fw-bold" onClick={()=>setCountdown(!countdown)}>{countdown?"Stop countdown":cuenta1===null?"Resume countdown": cdnum+1===0?"Resume countdown":`Resume countdown:${cdnum+1}`}</button>
 					<button className="col-2 p-1 rounded fw-bold" onClick={()=>reCuentaAtras(typetime)}>Start new countdown</button>
 				</div>
-				<div className="row justify-content-end p-1">
-					<input className="col-3" type="text" onChange={(e)=>escritura(e.target.value)} placeholder="Indique aqui el tiempo para la cuenta atras"/>
-					<div class="dropdown col-4" style={{height:"40px"}}>
-						<button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+				<div className="row  p-1">
+					<p className="text-white col-5 text-end">CUENTA ATRÁS</p>
+					<input className="col-3 " type="text" onChange={(e)=>writeCdnum(e.target.value)} placeholder="Indique aqui el tiempo para la cuenta atras"/>
+					<div className="dropdown col-4" style={{height:"40px"}}>
+						<button className="btn btn-secondary dropdown-toggle me-5" type="button" data-bs-toggle="dropdown" aria-expanded="false">
 							Elija la medida de tiempo que va a usar: {typetime}
 						</button>
-						<ul class="dropdown-menu">
-							<li><button class="dropdown-item" type="button" onClick={()=>setTypetime("secs")}>Segundos</button></li>
-							<li><button class="dropdown-item" type="button" onClick={()=>setTypetime("mins")}>Minutos</button></li>
-							<li><button class="dropdown-item" type="button" onClick={()=>setTypetime("hours")}>Horas</button></li>
+						<ul className="dropdown-menu">
+							<li><button className="dropdown-item" type="button" onClick={()=>setTypetime("secs")}>Segundos</button></li>
+							<li><button className="dropdown-item" type="button" onClick={()=>setTypetime("mins")}>Minutos</button></li>
+							<li><button className="dropdown-item" type="button" onClick={()=>setTypetime("hours")}>Horas</button></li>
 						</ul>
 					</div>
+				</div>
+				<div className="row  p-1" >
+					<p className="text-white col-4 text-end">ALARMA</p>
+					<input className="col-3 " type="text" onChange={(e)=>writealarm(e.target.value)} placeholder="Establezca su alarma de tiempo"/>
 				</div>
 			</div>
 		
 	);
 };
-
 export default Home;
