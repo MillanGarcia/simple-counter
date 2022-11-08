@@ -51,10 +51,28 @@ const Home = () => {
 		}
 		setCountdown(true);
 	}
+	
+	const reCuentaAtras2=(typetime)=>{
+		console.log(typetime)
+		switch (typetime) {
+			case "secs":
+				setAlerta(prealerta);
+				break;
+			case "mins":
+				setAlerta(prealerta*60);
+				break;
+			case "hours":
+				setAlerta(prealerta*3600);
+				break;
+			default:
+				break;
+		}
+		setCountdown(true);
+	}
 	const funciondoble=()=>{
 		setPlay(!play)
 		
-		reCuentaAtras(typetime)
+		reCuentaAtras2(typetime)
 		setCountdown(false);//importante posicionar el setCountdown(false) despues del recuentaatras, sino se bugea
 	}
 	const restart=()=>{
