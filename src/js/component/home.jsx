@@ -55,7 +55,7 @@ const Home = () => {
 		setPlay(!play)
 		
 		reCuentaAtras(typetime)
-		setCountdown(false);
+		setCountdown(false);//importante posicionar el setCountdown(false) despues del recuentaatras, sino se bugea
 	}
 	const restart=()=>{
 		setCuenta(0)
