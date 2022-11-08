@@ -10,6 +10,7 @@ const Home = () => {
 	const[alerta,setAlerta]=useState(0);
 	const[play,setPlay]=useState(false);////activa el contador hacia delante
 	const[typetime,setTypetime]=useState("secs");//indica el tipo de tiempo usado al escribir en la cuenta atrás necesaria
+	const[typetime2,setTypetime2]=useState("secs");//indica el tipo de tiempo usado al escribir en la cuenta atrás necesaria
 	const[countdown,setCountdown]=useState(false);//activa el contador hacia atras
 	const[cuenta,setCuenta]=useState(0);//Almacena la cuenta normal 
 	const[cdnum,setCdnum]=useState(0);//Almacena la cuenta atras
@@ -31,30 +32,31 @@ const Home = () => {
 		setPrealerta(nuevaalarma);
 	}
 	
-	const reCuentaAtras=(typetime)=>{
+	const reCuentaAtras=(typetime)=>{// al empezar una nueva cuenta atrás
 		console.log(typetime)
 		switch (typetime) {
 			case "secs":
 				setCdnum(precdnum);
-				setAlerta(prealerta);
+				
 				break;
 			case "mins":
 				setCdnum(precdnum*60);
-				setAlerta(prealerta*60);
+				
 				break;
 			case "hours":
 				setCdnum(precdnum*3600);
-				setAlerta(prealerta*3600);
+				
 				break;
 			default:
 				break;
 		}
+		reCuentaAtras2(typetime2)
 		setCountdown(true);
 	}
 	
-	const reCuentaAtras2=(typetime)=>{
-		console.log(typetime)
-		switch (typetime) {
+	const reCuentaAtras2=(typetime2)=>{
+		console.log(typetime2)
+		switch (typetime2) {
 			case "secs":
 				setAlerta(prealerta);
 				break;
@@ -67,14 +69,19 @@ const Home = () => {
 			default:
 				break;
 		}
-		setCountdown(true);
+		
 	}
+
 	const funciondoble=()=>{
 		setPlay(!play)
-		
-		reCuentaAtras2(typetime)
-		setCountdown(false);//importante posicionar el setCountdown(false) despues del recuentaatras, sino se bugea
+		reCuentaAtras2(typetime2)
 	}
+
+	const funciondoble2=()=>{
+		setCountdown(!countdown)
+		reCuentaAtras2(typetime2)
+	}
+
 	const restart=()=>{
 		setCuenta(0)
 		setPlay(false)
@@ -141,9 +148,7 @@ const Home = () => {
 			}
 			if(cuenta1===null && play===false && countdown===false){//este condicional if, sirve para pasar de nuevo la funcion restart, y no se quede el numero que aparece en imagen como el ultimo que conto, es necesario pasarla dos veces
 				restart();
-				
 				cuenta1===null ?console.log("CUENTA NULL"):"";
-				console.log("pepito")
 			}
 		//setPrealerta(prealerta-1)
 		//console.log("playing alerta "+prealerta)
@@ -174,7 +179,7 @@ const Home = () => {
 					<button className="col-2 p-1 rounded fw-bold" onClick={()=>restart()}>Restart</button>
 				</div>
 				<div className="row justify-content-end p-1  mx-5">	
-					<button className="col-2 p-1 rounded fw-bold" onClick={()=>setCountdown(!countdown)}>{countdown?"Stop countdown":cuenta1===null?"Resume countdown": cdnum+1===0?"Resume countdown":`Resume countdown:${cdnum+1}`}</button>
+					<button className="col-2 p-1 rounded fw-bold" onClick={()=>funciondoble2()}>{countdown?"Stop countdown":cuenta1===null?"Resume countdown": cdnum+1===0?"Resume countdown":`Resume countdown:${cdnum+1}`}</button>
 					<button className="col-2 p-1 rounded fw-bold" onClick={()=>reCuentaAtras(typetime)}>Start new countdown</button>
 				</div>
 				<div className="row  p-1">
@@ -194,6 +199,16 @@ const Home = () => {
 				<div className="row  p-1" >
 					<p className="text-white col-4 text-end">ALARMA</p>
 					<input className="col-3 " type="text" onChange={(e)=>writealarm(e.target.value)} placeholder="Establezca su alarma de tiempo"/>
+					<div className="dropdown col-4" style={{height:"40px"}}>
+						<button className="btn btn-secondary dropdown-toggle me-5" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+							Elija la medida de tiempo que va a usar: {typetime2}
+						</button>
+						<ul className="dropdown-menu">
+							<li><button className="dropdown-item" type="button" onClick={()=>setTypetime2("secs")}>Segundos</button></li>
+							<li><button className="dropdown-item" type="button" onClick={()=>setTypetime2("mins")}>Minutos</button></li>
+							<li><button className="dropdown-item" type="button" onClick={()=>setTypetime2("hours")}>Horas</button></li>
+						</ul>
+					</div>
 				</div>
 			</div>
 		
